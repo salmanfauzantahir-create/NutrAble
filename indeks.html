@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutrAble - Smart AI Nutrition Assistant</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Poppins', sans-serif; }
+    html, body { height: 100%; }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #ffffff 0%, #e8f4fd 50%, #d4edda 100%);
+    }
+    
+    .green-gradient {
+      background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    }
+    
+    .blue-gradient {
+      background: linear-gradient(135deg, #42A5F5 0%, #64B5F6 100%);
+    }
+    
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .float-animation-delayed {
+      animation: float 6s ease-in-out infinite;
+      animation-delay: -3s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    
+    .pulse-ring {
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    
+    .scan-line {
+      animation: scan 2s ease-in-out infinite;
+    }
+    
+    @keyframes scan {
+      0%, 100% { top: 10%; }
+      50% { top: 85%; }
+    }
+    
+    .progress-animate {
+      animation: progressGrow 1.5s ease-out forwards;
+    }
+    
+    @keyframes progressGrow {
+      from { width: 0; }
+    }
+    
+    .dotted-line {
+      background-image: linear-gradient(to right, #4CAF50 40%, transparent 40%);
+      background-size: 12px 3px;
+      background-repeat: repeat-x;
+    }
+    
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #4CAF50; border-radius: 4px; }
+    
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full overflow-auto gradient-bg">
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center">
+   <div class="text-center space-y-8 px-6">
+    <!-- Logo Animation -->
+    <div class="inline-block animate-pulse">
+     <div class="w-24 h-24 green-gradient rounded-3xl flex items-center justify-center mx-auto shadow-2xl shadow-green-200">
+      <svg class="w-12 h-12 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+      </svg>
+     </div>
+    </div><!-- Title -->
+    <div class="space-y-3">
+     <h1 id="splash_title" class="text-5xl font-bold text-gray-800">NutrAble</h1>
+     <p class="text-xl text-gray-600">Smart AI Nutrition Assistant</p>
+     <div class="flex items-center justify-center gap-2 text-green-600 font-medium">
+      <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Powered by Wearable Data
+     </div>
+    </div><!-- Loading Bar -->
+    <div class="w-64 h-1 bg-gray-200 rounded-full overflow-hidden mx-auto">
+     <div class="h-full green-gradient rounded-full animate-pulse" style="width: 100%;"></div>
+    </div><!-- CTA Button --> <button id="splash-button" class="green-gradient text-white px-12 py-4 rounded-full font-bold text-lg hover:shadow-xl hover:shadow-green-200 transition transform hover:scale-105 mt-8"> <span id="splash_button_text">Get Started</span> </button> <!-- Decorative Elements -->
+    <div class="absolute -left-8 top-1/4 w-40 h-40 bg-green-200 rounded-full opacity-30 blur-3xl"></div>
+    <div class="absolute -right-8 bottom-1/4 w-48 h-48 bg-blue-200 rounded-full opacity-30 blur-3xl"></div>
+   </div>
+  </div>
+  <div class="w-full min-h-full" id="main-content" style="display: none;"><!-- Navigation -->
+   <nav class="fixed top-0 left-0 right-0 z-50 glass-card">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+     <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+       <div class="w-10 h-10 green-gradient rounded-xl flex items-center justify-center">
+        <svg class="w-6 h-6 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+        </svg>
+       </div><span class="text-xl font-bold text-gray-800">NutrAble</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8"><a href="#features" class="text-gray-600 hover:text-green-600 transition font-medium">Features</a> <a href="#how-it-works" class="text-gray-600 hover:text-green-600 transition font-medium">How It Works</a> <a href="#dashboard" class="text-gray-600 hover:text-green-600 transition font-medium">Dashboard</a> <a href="#profile" class="text-gray-600 hover:text-green-600 transition font-medium">Profile</a>
+      </div><button class="green-gradient text-white px-6 py-2.5 rounded-full font-semibold hover:shadow-lg hover:shadow-green-200 transition"> Get Started </button>
+     </div>
+    </div>
+   </nav><!-- Hero Section -->
+   <section class="pt-32 pb-20 px-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div class="space-y-8">
+       <div class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> AI-Powered Health Technology
+       </div>
+       <h1 id="headline" class="text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-800 leading-tight">Smart AI Nutrition Assistant Powered by Wearable Data</h1>
+       <p id="subheadline" class="text-xl text-gray-600 leading-relaxed">Scan your food. Track your health. Get personalized recommendations instantly.</p>
+       <div class="flex flex-wrap gap-4"><button class="green-gradient text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-green-200 transition transform hover:scale-105"> Try Demo </button> <button class="bg-white text-gray-800 px-8 py-4 rounded-full font-semibold text-lg border-2 border-gray-200 hover:border-green-400 transition"> Get Started → </button>
+       </div>
+       <div class="flex items-center gap-8 pt-4">
+        <div class="flex items-center gap-2">
+         <svg class="w-5 h-5 text-green-500" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+         </svg><span class="text-gray-600">Free to start</span>
+        </div>
+        <div class="flex items-center gap-2">
+         <svg class="w-5 h-5 text-green-500" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+         </svg><span class="text-gray-600">No credit card</span>
+        </div>
+       </div>
+      </div><!-- Hero Visual -->
+      <div class="relative"><!-- Phone Mockup -->
+       <div class="float-animation relative z-10">
+        <div class="bg-gray-900 rounded-[3rem] p-3 shadow-2xl max-w-[320px] mx-auto">
+         <div class="bg-white rounded-[2.5rem] overflow-hidden"><!-- Phone Screen -->
+          <div class="bg-gradient-to-b from-green-50 to-white p-6 space-y-4">
+           <div class="flex items-center justify-between"><span class="text-xs text-gray-500">12:30</span>
+            <div class="flex gap-1">
+             <div class="w-4 h-2 bg-gray-800 rounded-sm"></div>
+             <div class="w-4 h-2 bg-gray-300 rounded-sm"></div>
+            </div>
+           </div>
+           <div class="text-center py-2">
+            <div id="scan-result-badge" class="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+             <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+             </svg> Balanced Plate Identified
+            </div>
+           </div><!-- Food Illustration -->
+           <div id="scan-result-food" class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 flex items-center justify-center gap-2"><span class="text-4xl">🍚</span> <span class="text-4xl">🍗</span> <span class="text-4xl">🥬</span> <span class="text-4xl">🌽</span> <span class="text-4xl">🥚</span>
+           </div><!-- Nutrition Stats -->
+           <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <p class="text-xs text-gray-500 mb-3">Nutrition Estimation</p>
+            <div class="text-center mb-3"><span id="scan-result-calories" class="text-3xl font-bold text-gray-800">540</span> <span class="text-lg text-gray-500 ml-1">kcal</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+             <div class="text-center p-2 bg-blue-50 rounded-xl">
+              <p class="text-xs text-gray-500">Carbs</p>
+              <p id="scan-result-carbs" class="font-bold text-blue-600">83g</p>
+             </div>
+             <div class="text-center p-2 bg-red-50 rounded-xl">
+              <p class="text-xs text-gray-500">Protein</p>
+              <p id="scan-result-protein" class="font-bold text-red-500">23g</p>
+             </div>
+             <div class="text-center p-2 bg-yellow-50 rounded-xl">
+              <p class="text-xs text-gray-500">Fats</p>
+              <p id="scan-result-fats" class="font-bold text-yellow-600">12g</p>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div><!-- Smartband -->
+       <div class="absolute -right-4 top-1/2 -translate-y-1/2 float-animation-delayed z-20">
+        <div class="glass-card rounded-3xl p-4 shadow-xl">
+         <div class="bg-gray-900 rounded-2xl p-3 w-24">
+          <div class="bg-black rounded-xl p-2 space-y-2">
+           <div class="flex items-center gap-1">
+            <svg class="w-3 h-3 text-red-500" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+            </svg><span class="text-white text-xs font-medium">82</span>
+           </div>
+           <div class="flex items-center gap-1"><span class="text-xs">👟</span> <span class="text-white text-xs font-medium">4330</span>
+           </div>
+           <div class="flex items-center gap-1"><span class="text-xs">💧</span> <span class="text-green-400 text-xs font-medium">Good</span>
+           </div>
+          </div>
+         </div>
+         <p class="text-xs text-gray-600 text-center mt-2 font-medium">SmartFit Pro</p>
+        </div>
+       </div><!-- Decorative Elements -->
+       <div class="absolute -left-8 top-20 w-20 h-20 bg-green-200 rounded-full opacity-50 blur-xl"></div>
+       <div class="absolute right-0 bottom-20 w-32 h-32 bg-blue-200 rounded-full opacity-50 blur-xl"></div>
+      </div>
+     </div>
+    </div>
+   </section><!-- AI Food Scanner Section -->
+   <section id="features" class="py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="grid lg:grid-cols-2 gap-16 items-center"><!-- Scanner Visual -->
+      <div class="order-2 lg:order-1">
+       <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover">
+        <div class="bg-gray-900 rounded-2xl p-4 relative overflow-hidden"><!-- Camera View -->
+         <div class="aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl relative overflow-hidden"><!-- Scan Frame -->
+          <div class="absolute inset-8 border-2 border-green-400 rounded-xl">
+           <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400 rounded-tl-xl"></div>
+           <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400 rounded-tr-xl"></div>
+           <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400 rounded-bl-xl"></div>
+           <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400 rounded-br-xl"></div>
+          </div><!-- Scan Line -->
+          <div class="scan-line absolute left-8 right-8 h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent"></div><!-- Food Preview -->
+          <div class="absolute inset-0 flex items-center justify-center">
+           <div class="text-6xl opacity-80">
+            🍽️
+           </div>
+          </div><!-- AI Badge -->
+          <div class="absolute top-4 left-4 bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1">
+           <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div> AI Active
+          </div>
+         </div><!-- Controls -->
+         <div class="flex justify-center gap-4 mt-4"><button class="green-gradient text-white px-6 py-3 rounded-full font-medium flex items-center gap-2">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+           </svg> Auto Scan </button> <button class="bg-gray-700 text-white px-6 py-3 rounded-full font-medium"> Manual Entry </button>
+         </div>
+        </div>
+       </div>
+      </div><!-- Content -->
+      <div class="order-1 lg:order-2 space-y-8">
+       <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
+        <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /> <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+        </svg> Advanced Recognition
+       </div>
+       <h2 class="text-4xl lg:text-5xl font-bold text-gray-800">AI Food Scanner</h2>
+       <p class="text-xl text-gray-600 leading-relaxed">Point your camera at your meal. Our AI identifies ingredients and estimates nutrition instantly.</p>
+       <div class="grid sm:grid-cols-3 gap-4">
+        <div class="glass-card rounded-2xl p-5 card-hover">
+         <div class="w-12 h-12 green-gradient rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-white" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.414 1.415l.708-.708zm-7.072 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clip-rule="evenodd" />
+          </svg>
+         </div>
+         <h3 class="font-semibold text-gray-800 mb-1">AI Recognition</h3>
+         <p class="text-sm text-gray-500">Smart food detection</p>
+        </div>
+        <div class="glass-card rounded-2xl p-5 card-hover">
+         <div class="w-12 h-12 blue-gradient rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-white" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+          </svg>
+         </div>
+         <h3 class="font-semibold text-gray-800 mb-1">Instant Analysis</h3>
+         <p class="text-sm text-gray-500">Real-time results</p>
+        </div>
+        <div class="glass-card rounded-2xl p-5 card-hover">
+         <div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-400 rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-white" fill="currentColor" viewbox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /> <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+          </svg>
+         </div>
+         <h3 class="font-semibold text-gray-800 mb-1">Accurate Tracking</h3>
+         <p class="text-sm text-gray-500">Precise calories</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Nutrition Analysis Section -->
+   <section class="py-20 px-6 bg-gradient-to-r from-green-50 to-blue-50">
+    <div class="max-w-7xl mx-auto">
+     <div class="text-center mb-16">
+      <h2 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">Nutrition Analysis &amp; Balanced Plate</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Get detailed nutritional breakdown and hidden hunger risk assessment</p>
+     </div>
+     <div class="grid lg:grid-cols-3 gap-8"><!-- Food Card -->
+      <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover">
+       <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+         <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+         </svg> Balanced Plate Identified
+        </div>
+       </div>
+       <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 mb-6">
+        <div class="flex flex-wrap justify-center gap-3">
+         <div class="w-16 h-16 bg-white rounded-2xl shadow flex items-center justify-center text-3xl">
+          🍚
+         </div>
+         <div class="w-16 h-16 bg-white rounded-2xl shadow flex items-center justify-center text-3xl">
+          🍗
+         </div>
+         <div class="w-16 h-16 bg-white rounded-2xl shadow flex items-center justify-center text-3xl">
+          🥬
+         </div>
+         <div class="w-16 h-16 bg-white rounded-2xl shadow flex items-center justify-center text-3xl">
+          🌽
+         </div>
+         <div class="w-16 h-16 bg-white rounded-2xl shadow flex items-center justify-center text-3xl">
+          🥚
+         </div>
+        </div>
+       </div>
+       <div class="space-y-3">
+        <div class="flex items-center justify-between text-sm"><span class="text-gray-600">Rice</span> <span class="font-medium text-gray-800">150g</span>
+        </div>
+        <div class="flex items-center justify-between text-sm"><span class="text-gray-600">Grilled Chicken</span> <span class="font-medium text-gray-800">100g</span>
+        </div>
+        <div class="flex items-center justify-between text-sm"><span class="text-gray-600">Vegetables</span> <span class="font-medium text-gray-800">80g</span>
+        </div>
+       </div>
+      </div><!-- Nutrition Stats -->
+      <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover">
+       <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Nutrition Estimation</h3><!-- Circular Progress -->
+       <div class="relative w-40 h-40 mx-auto mb-6">
+        <svg class="w-full h-full transform -rotate-90"><circle cx="80" cy="80" r="70" fill="none" stroke="#E5E7EB" stroke-width="12" /> <circle cx="80" cy="80" r="70" fill="none" stroke="#4CAF50" stroke-width="12" stroke-dasharray="440" stroke-dashoffset="110" stroke-linecap="round" />
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-4xl font-bold text-gray-800">540</span> <span class="text-gray-500">kcal</span>
+        </div>
+       </div><!-- Macros -->
+       <div class="space-y-4">
+        <div>
+         <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">Carbohydrates</span> <span class="font-semibold text-blue-600">83g</span>
+         </div>
+         <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 65%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">Protein</span> <span class="font-semibold text-red-500">23g</span>
+         </div>
+         <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-red-400 to-red-500 rounded-full" style="width: 33%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between text-sm mb-1"><span class="text-gray-600">Fats</span> <span class="font-semibold text-yellow-600">12g</span>
+         </div>
+         <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full" style="width: 18%"></div>
+         </div>
+        </div>
+       </div>
+      </div><!-- Hidden Hunger Risk -->
+      <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover">
+       <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Hidden Hunger Risk</h3>
+       <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full font-medium">
+         <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+         </svg> Moderate Risk
+        </div>
+       </div>
+       <div class="space-y-4">
+        <div class="bg-red-50 rounded-xl p-4">
+         <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center"><span class="text-red-500 font-bold text-sm">B</span>
+          </div>
+          <div>
+           <p class="font-semibold text-gray-800">Vitamin B</p>
+           <p class="text-sm text-red-500">Low Level</p>
+          </div>
+         </div>
+         <div class="h-2 bg-red-100 rounded-full overflow-hidden">
+          <div class="h-full bg-red-400 rounded-full" style="width: 30%"></div>
+         </div>
+        </div>
+        <div class="bg-yellow-50 rounded-xl p-4">
+         <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center"><span class="text-yellow-600 font-bold text-sm">Fe</span>
+          </div>
+          <div>
+           <p class="font-semibold text-gray-800">Iron</p>
+           <p class="text-sm text-yellow-600">Below Optimal</p>
+          </div>
+         </div>
+         <div class="h-2 bg-yellow-100 rounded-full overflow-hidden">
+          <div class="h-full bg-yellow-400 rounded-full" style="width: 55%"></div>
+         </div>
+        </div>
+        <div class="bg-green-50 rounded-xl p-4">
+         <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"><span class="text-green-600 font-bold text-sm">C</span>
+          </div>
+          <div>
+           <p class="font-semibold text-gray-800">Vitamin C</p>
+           <p class="text-sm text-green-600">Adequate</p>
+          </div>
+         </div>
+         <div class="h-2 bg-green-100 rounded-full overflow-hidden">
+          <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Personalized Recommendations -->
+   <section class="py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+       <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+       </svg> AI-Powered Insights
+      </div>
+      <h2 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">Personalized AI Recommendations</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Smart suggestions tailored to your nutritional needs</p>
+     </div>
+     <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto"><!-- Iron Recommendation -->
+      <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover border-l-4 border-red-400">
+       <div class="flex items-start gap-4 mb-6">
+        <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+         <svg class="w-7 h-7 text-red-500" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
+         </svg>
+        </div>
+        <div>
+         <h3 class="text-xl font-bold text-gray-800 mb-1">Increase Iron Intake</h3>
+         <p class="text-gray-500">Your iron levels are below optimal</p>
+        </div>
+       </div>
+       <div class="bg-red-50 rounded-2xl p-5 mb-6">
+        <p class="text-sm text-gray-600 mb-3 font-medium">Recommended Foods:</p>
+        <div class="flex flex-wrap gap-2"><span class="bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-700 shadow-sm">🥬 Spinach</span> <span class="bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-700 shadow-sm">🥩 Beef</span> <span class="bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-700 shadow-sm">🥚 Eggs</span>
+        </div>
+       </div><button class="w-full green-gradient text-white py-3 rounded-xl font-semibold hover:shadow-lg transition"> Apply Tips </button>
+      </div><!-- Fiber Recommendation -->
+      <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover border-l-4 border-green-400">
+       <div class="flex items-start gap-4 mb-6">
+        <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+         <svg class="w-7 h-7 text-green-500" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+         </svg>
+        </div>
+        <div>
+         <h3 class="text-xl font-bold text-gray-800 mb-1">Enhance Fiber Intake</h3>
+         <p class="text-gray-500">Boost your digestive health</p>
+        </div>
+       </div>
+       <div class="bg-green-50 rounded-2xl p-5 mb-6">
+        <p class="text-sm text-gray-600 mb-3 font-medium">Recommended Foods:</p>
+        <div class="flex flex-wrap gap-2"><span class="bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-700 shadow-sm">🫘 Tempeh</span> <span class="bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-700 shadow-sm">�� Beans</span> <span class="bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-700 shadow-sm">🥦 Broccoli</span>
+        </div>
+       </div><button class="w-full green-gradient text-white py-3 rounded-xl font-semibold hover:shadow-lg transition"> Apply Tips </button>
+      </div>
+     </div>
+    </div>
+   </section><!-- Daily Dashboard -->
+   <section id="dashboard" class="py-20 px-6 bg-gradient-to-r from-blue-50 to-green-50">
+    <div class="max-w-7xl mx-auto">
+     <div class="text-center mb-16">
+      <h2 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">Your Health Status Today</h2>
+      <p class="text-xl text-gray-600">Real-time insights from your daily activities</p>
+     </div>
+     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"><!-- Nutrition Score -->
+      <div class="glass-card rounded-[2rem] p-6 shadow-xl card-hover">
+       <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-700">Nutrition Score</h3>
+        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+         <svg class="w-5 h-5 text-green-600" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+         </svg>
+        </div>
+       </div>
+       <div class="relative w-24 h-24 mx-auto mb-4">
+        <svg class="w-full h-full transform -rotate-90"><circle cx="48" cy="48" r="40" fill="none" stroke="#E5E7EB" stroke-width="8" /> <circle cx="48" cy="48" r="40" fill="none" stroke="#4CAF50" stroke-width="8" stroke-dasharray="251" stroke-dashoffset="63" stroke-linecap="round" />
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-2xl font-bold text-gray-800">75</span> <span class="text-xs text-gray-500">/100</span>
+        </div>
+       </div>
+       <p class="text-center text-sm text-green-600 font-medium">Good Progress!</p>
+      </div><!-- Energy Balance -->
+      <div class="glass-card rounded-[2rem] p-6 shadow-xl card-hover">
+       <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-700">Energy Balance</h3>
+        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+         <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+         </svg>
+        </div>
+       </div>
+       <div class="space-y-3">
+        <div>
+         <div class="flex justify-between text-sm mb-1"><span class="text-gray-500">Calories In</span> <span class="font-semibold text-green-600">1550</span>
+         </div>
+         <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full" style="width: 78%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between text-sm mb-1"><span class="text-gray-500">Calories Out</span> <span class="font-semibold text-orange-500">1750</span>
+         </div>
+         <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full" style="width: 88%"></div>
+         </div>
+        </div>
+       </div>
+       <p class="text-center text-sm text-blue-600 font-medium mt-4">-200 kcal deficit</p>
+      </div><!-- Hydration -->
+      <div class="glass-card rounded-[2rem] p-6 shadow-xl card-hover">
+       <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-700">Hydration</h3>
+        <div class="w-10 h-10 bg-cyan-100 rounded-xl flex items-center justify-center"><span class="text-xl">💧</span>
+        </div>
+       </div>
+       <div class="relative h-32 w-20 mx-auto mb-4 bg-cyan-50 rounded-2xl border-2 border-cyan-200 overflow-hidden">
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-400 to-cyan-300 transition-all duration-1000" style="height: 60%"></div>
+        <div class="absolute inset-0 flex items-center justify-center"><span class="text-lg font-bold text-white drop-shadow">1.5L</span>
+        </div>
+       </div>
+       <div class="text-center">
+        <p class="text-sm text-gray-500">Target: <span class="font-semibold text-gray-700">2.5L</span></p>
+        <p class="text-xs text-cyan-600 font-medium mt-1">1L more to go</p>
+       </div>
+      </div><!-- Steps -->
+      <div class="glass-card rounded-[2rem] p-6 shadow-xl card-hover">
+       <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-700">Steps</h3>
+        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center"><span class="text-xl">👟</span>
+        </div>
+       </div>
+       <div class="text-center mb-4"><span class="text-4xl font-bold text-gray-800">4,320</span>
+        <p class="text-sm text-gray-500">of 8,000 steps</p>
+       </div>
+       <div class="h-4 bg-gray-100 rounded-full overflow-hidden mb-2">
+        <div class="progress-animate h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style="width: 54%"></div>
+       </div>
+       <p class="text-center text-sm text-purple-600 font-medium">54% Complete</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Profile Section -->
+   <section id="profile" class="py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="grid lg:grid-cols-2 gap-12"><!-- Profile Card -->
+      <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover">
+       <div class="flex items-center gap-6 mb-8">
+        <div class="w-24 h-24 green-gradient rounded-2xl flex items-center justify-center text-4xl text-white font-bold">
+         AS
+        </div>
+        <div>
+         <h3 id="user_name_display" class="text-2xl font-bold text-gray-800">Adi Setiawan</h3>
+         <p class="text-gray-500">Health Enthusiast</p>
+         <div class="flex items-center gap-2 mt-2"><span class="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded-full font-medium">Moderate Risk</span>
+         </div>
+        </div>
+       </div>
+       <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+         <p class="text-gray-500 text-sm">Age</p>
+         <p class="text-2xl font-bold text-gray-800">29</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+         <p class="text-gray-500 text-sm">Height</p>
+         <p class="text-2xl font-bold text-gray-800">173 <span class="text-sm">cm</span></p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+         <p class="text-gray-500 text-sm">Weight</p>
+         <p class="text-2xl font-bold text-gray-800">68 <span class="text-sm">kg</span></p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+         <p class="text-gray-500 text-sm">BMI</p>
+         <p class="text-2xl font-bold text-green-600">22.7</p>
+        </div>
+       </div>
+       <div class="bg-blue-50 rounded-xl p-4 flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"><span class="text-2xl">⌚</span>
+        </div>
+        <div>
+         <p class="font-semibold text-gray-800">SmartFit Pro WF45P</p>
+         <p class="text-sm text-green-600 flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Connected</p>
+        </div>
+       </div>
+      </div><!-- Daily Intake Goals -->
+      <div class="glass-card rounded-[2rem] p-8 shadow-xl card-hover">
+       <h3 class="text-2xl font-bold text-gray-800 mb-8">Daily Intake Goals</h3>
+       <div class="space-y-6">
+        <div>
+         <div class="flex justify-between mb-2"><span class="text-gray-600 font-medium">Calories</span> <span class="font-bold text-gray-800">1550 / 2000 kcal</span>
+         </div>
+         <div class="h-4 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full green-gradient rounded-full" style="width: 78%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between mb-2"><span class="text-gray-600 font-medium">Carbohydrates</span> <span class="font-bold text-gray-800">180 / 260g</span>
+         </div>
+         <div class="h-4 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 69%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between mb-2"><span class="text-gray-600 font-medium">Protein</span> <span class="font-bold text-gray-800">52 / 70g</span>
+         </div>
+         <div class="h-4 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-red-400 to-red-500 rounded-full" style="width: 74%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between mb-2"><span class="text-gray-600 font-medium">Water</span> <span class="font-bold text-gray-800">1500 / 2500 ml</span>
+         </div>
+         <div class="h-4 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-cyan-400 to-cyan-500 rounded-full" style="width: 60%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between mb-2"><span class="text-gray-600 font-medium">Steps</span> <span class="font-bold text-gray-800">4320 / 8000</span>
+         </div>
+         <div class="h-4 bg-gray-100 rounded-full overflow-hidden">
+          <div class="progress-animate h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style="width: 54%"></div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Wearable Integration -->
+   <section class="py-20 px-6 bg-gradient-to-r from-gray-900 to-gray-800">
+    <div class="max-w-7xl mx-auto">
+     <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div class="space-y-8">
+       <div class="inline-flex items-center gap-2 bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-medium"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Real-Time Sync
+       </div>
+       <h2 class="text-4xl lg:text-5xl font-bold text-white">Connected to Your Smart Devices</h2>
+       <p class="text-xl text-gray-400 leading-relaxed">NutrAble integrates seamlessly with your wearable devices to optimize recommendations based on real-time data.</p>
+       <div class="flex flex-wrap gap-4">
+        <div class="bg-white/10 backdrop-blur rounded-2xl px-6 py-4 flex items-center gap-3">
+         <div class="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-red-400" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+          </svg>
+         </div>
+         <div>
+          <p class="text-white font-semibold">Heart Rate</p>
+          <p class="text-gray-400 text-sm">82 bpm</p>
+         </div>
+        </div>
+        <div class="bg-white/10 backdrop-blur rounded-2xl px-6 py-4 flex items-center gap-3">
+         <div class="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center"><span class="text-xl">💧</span>
+         </div>
+         <div>
+          <p class="text-white font-semibold">Hydration</p>
+          <p class="text-green-400 text-sm">Good</p>
+         </div>
+        </div>
+        <div class="bg-white/10 backdrop-blur rounded-2xl px-6 py-4 flex items-center gap-3">
+         <div class="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center"><span class="text-xl">👟</span>
+         </div>
+         <div>
+          <p class="text-white font-semibold">Steps</p>
+          <p class="text-gray-400 text-sm">4,330</p>
+         </div>
+        </div>
+       </div>
+      </div><!-- Visual -->
+      <div class="relative">
+       <div class="flex items-center justify-center gap-8"><!-- Phone -->
+        <div class="relative float-animation">
+         <div class="bg-gray-700 rounded-[2rem] p-2 shadow-2xl">
+          <div class="bg-gray-900 rounded-[1.5rem] w-36 h-72 flex items-center justify-center">
+           <div class="text-center">
+            <div class="w-16 h-16 green-gradient rounded-2xl flex items-center justify-center mx-auto mb-3">
+             <svg class="w-8 h-8 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+             </svg>
+            </div>
+            <p class="text-white font-semibold text-sm">NutrAble</p>
+           </div>
+          </div>
+         </div>
+        </div><!-- Connection Line -->
+        <div class="flex flex-col items-center gap-2">
+         <div class="w-24 h-1 dotted-line"></div>
+         <div class="bg-green-500 rounded-full p-2">
+          <svg class="w-4 h-4 text-white" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+          </svg>
+         </div>
+         <div class="w-24 h-1 dotted-line"></div>
+        </div><!-- Smartband -->
+        <div class="relative float-animation-delayed">
+         <div class="bg-gray-700 rounded-3xl p-3 shadow-2xl">
+          <div class="bg-gray-900 rounded-2xl w-20 h-40 flex flex-col items-center justify-center gap-3 p-3">
+           <div class="w-full bg-gray-800 rounded-xl p-2 space-y-2">
+            <div class="flex items-center gap-1"><span class="text-red-400 text-xs">❤️</span> <span class="text-white text-xs font-bold">82</span>
+            </div>
+            <div class="flex items-center gap-1"><span class="text-xs">👟</span> <span class="text-white text-xs font-bold">4330</span>
+            </div>
+            <div class="flex items-center gap-1"><span class="text-xs">💧</span> <span class="text-green-400 text-xs font-bold">OK</span>
+            </div>
+           </div>
+           <p class="text-gray-500 text-xs">SmartFit</p>
+          </div>
+         </div>
+        </div>
+       </div><!-- Decorative -->
+       <div class="absolute -left-8 top-1/2 w-40 h-40 bg-green-500/20 rounded-full blur-3xl"></div>
+       <div class="absolute -right-8 top-1/4 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+      </div>
+     </div>
+    </div>
+   </section><!-- How It Works -->
+   <section id="how-it-works" class="py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="text-center mb-16">
+      <h2 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">How It Works</h2>
+      <p class="text-xl text-gray-600">Three simple steps to better nutrition</p>
+     </div>
+     <div class="grid md:grid-cols-3 gap-8 relative"><!-- Connection Line -->
+      <div class="hidden md:block absolute top-24 left-1/4 right-1/4 h-1 dotted-line"></div><!-- Step 1 -->
+      <div class="text-center relative">
+       <div class="w-20 h-20 green-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-200 relative z-10">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+       </div>
+       <div class="inline-block bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full mb-4">
+        Step 1
+       </div>
+       <h3 class="text-xl font-bold text-gray-800 mb-2">Scan Your Food</h3>
+       <p class="text-gray-600">Point your camera at any meal for instant recognition</p>
+      </div><!-- Step 2 -->
+      <div class="text-center relative">
+       <div class="w-20 h-20 blue-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200 relative z-10">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+       </div>
+       <div class="inline-block bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full mb-4">
+        Step 2
+       </div>
+       <h3 class="text-xl font-bold text-gray-800 mb-2">AI Analyzes Nutrition</h3>
+       <p class="text-gray-600">Get detailed breakdown of calories, macros, and micronutrients</p>
+      </div><!-- Step 3 -->
+      <div class="text-center relative">
+       <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-200 relative z-10">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <div class="inline-block bg-purple-100 text-purple-700 text-sm font-bold px-3 py-1 rounded-full mb-4">
+        Step 3
+       </div>
+       <h3 class="text-xl font-bold text-gray-800 mb-2">Get Recommendations</h3>
+       <p class="text-gray-600">Receive personalized tips to optimize your health</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Final CTA -->
+   <section class="py-20 px-6">
+    <div class="max-w-5xl mx-auto">
+     <div class="green-gradient rounded-[3rem] p-12 md:p-16 text-center relative overflow-hidden"><!-- Decorative circles -->
+      <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+      <div class="relative z-10">
+       <h2 id="final_cta" class="text-3xl md:text-5xl font-bold text-white mb-6">Start Eating Smarter Today</h2>
+       <p class="text-xl text-white/80 mb-10 max-w-2xl mx-auto">Join thousands of users who are transforming their health with AI-powered nutrition insights</p>
+       <div class="flex flex-wrap justify-center gap-4"><button class="bg-white text-green-600 px-8 py-4 rounded-full font-bold text-lg hover:shadow-xl transition transform hover:scale-105"> Download App </button> <button class="bg-transparent text-white px-8 py-4 rounded-full font-bold text-lg border-2 border-white hover:bg-white/10 transition"> Try Free Demo </button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Footer -->
+   <footer class="py-12 px-6 bg-gray-900">
+    <div class="max-w-7xl mx-auto">
+     <div class="grid md:grid-cols-4 gap-8 mb-12">
+      <div>
+       <div class="flex items-center gap-2 mb-4">
+        <div class="w-10 h-10 green-gradient rounded-xl flex items-center justify-center">
+         <svg class="w-6 h-6 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+         </svg>
+        </div><span class="text-xl font-bold text-white">NutrAble</span>
+       </div>
+       <p class="text-gray-400 text-sm">Your AI-powered nutrition companion for a healthier lifestyle.</p>
+      </div>
+      <div>
+       <h4 class="font-semibold text-white mb-4">Features</h4>
+       <ul class="space-y-2 text-gray-400 text-sm">
+        <li><a href="#" class="hover:text-green-400 transition">Food Scanner</a></li>
+        <li><a href="#" class="hover:text-green-400 transition">Nutrition Analysis</a></li>
+        <li><a href="#" class="hover:text-green-400 transition">AI Recommendations</a></li>
+        <li><a href="#" class="hover:text-green-400 transition">Wearable Integration</a></li>
+       </ul>
+      </div>
+      <div>
+       <h4 class="font-semibold text-white mb-4">Company</h4>
+       <ul class="space-y-2 text-gray-400 text-sm">
+        <li><a href="#" class="hover:text-green-400 transition">How It Works</a></li>
+        <li><a href="#" class="hover:text-green-400 transition">Dashboard</a></li>
+        <li><a href="#" class="hover:text-green-400 transition">Profile</a></li>
+        <li><a href="#" class="hover:text-green-400 transition">Contact</a></li>
+       </ul>
+      </div>
+      <div>
+       <h4 class="font-semibold text-white mb-4">Connect</h4>
+       <div class="flex gap-3"><a href="#" class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-green-500 hover:text-white transition">
+         <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+         </svg></a> <a href="#" class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-green-500 hover:text-white transition">
+         <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+         </svg></a> <a href="#" class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-green-500 hover:text-white transition">
+         <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+         </svg></a>
+       </div>
+      </div>
+     </div>
+     <div class="border-t border-gray-800 pt-8 text-center">
+      <p class="text-gray-500 text-sm">© 2026 NutrAble. All rights reserved.</p>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+    // Splash screen handler
+    const splashScreen = document.getElementById('splash-screen');
+    const mainContent = document.getElementById('main-content');
+    const splashButton = document.getElementById('splash-button');
+    
+    splashButton.addEventListener('click', () => {
+      splashScreen.style.animation = 'fadeOut 0.8s ease-out forwards';
+      setTimeout(() => {
+        splashScreen.style.display = 'none';
+        mainContent.style.display = 'block';
+        mainContent.style.animation = 'fadeIn 0.8s ease-out';
+        
+        // Scroll to dashboard section
+        const dashboardSection = document.getElementById('dashboard');
+        if (dashboardSection) {
+          dashboardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 800);
+    });
+    
+    const defaultConfig = {
+      splash_title: "NutrAble",
+      splash_button: "Get Started",
+      headline: "Smart AI Nutrition Assistant Powered by Wearable Data",
+      subheadline: "Scan your food. Track your health. Get personalized recommendations instantly.",
+      user_name: "Adi Setiawan",
+      final_cta_text: "Start Eating Smarter Today",
+      primary_color: "#4CAF50",
+      secondary_color: "#42A5F5",
+      background_color: "#ffffff",
+      text_color: "#1f2937",
+      accent_color: "#66BB6A"
+    };
+
+    async function onConfigChange(config) {
+      const splashTitle = document.getElementById('splash_title');
+      const splashButtonText = document.getElementById('splash_button_text');
+      const headline = document.getElementById('headline');
+      const subheadline = document.getElementById('subheadline');
+      const userNameDisplay = document.getElementById('user_name_display');
+      const finalCta = document.getElementById('final_cta');
+
+      if (splashTitle) {
+        splashTitle.textContent = config.splash_title || defaultConfig.splash_title;
+      }
+      if (splashButtonText) {
+        splashButtonText.textContent = config.splash_button || defaultConfig.splash_button;
+      }
+      if (headline) {
+        headline.textContent = config.headline || defaultConfig.headline;
+      }
+      if (subheadline) {
+        subheadline.textContent = config.subheadline || defaultConfig.subheadline;
+      }
+      if (userNameDisplay) {
+        userNameDisplay.textContent = config.user_name || defaultConfig.user_name;
+      }
+      if (finalCta) {
+        finalCta.textContent = config.final_cta_text || defaultConfig.final_cta_text;
+      }
+
+      // Apply colors
+      document.documentElement.style.setProperty('--primary-color', config.primary_color || defaultConfig.primary_color);
+      document.documentElement.style.setProperty('--secondary-color', config.secondary_color || defaultConfig.secondary_color);
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_color || defaultConfig.primary_color,
+            set: (value) => {
+              config.primary_color = value;
+              window.elementSdk.setConfig({ primary_color: value });
+            }
+          },
+          {
+            get: () => config.secondary_color || defaultConfig.secondary_color,
+            set: (value) => {
+              config.secondary_color = value;
+              window.elementSdk.setConfig({ secondary_color: value });
+            }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              window.elementSdk.setConfig({ accent_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["splash_title", config.splash_title || defaultConfig.splash_title],
+        ["splash_button", config.splash_button || defaultConfig.splash_button],
+        ["headline", config.headline || defaultConfig.headline],
+        ["subheadline", config.subheadline || defaultConfig.subheadline],
+        ["user_name", config.user_name || defaultConfig.user_name],
+        ["final_cta_text", config.final_cta_text || defaultConfig.final_cta_text]
+      ]);
+    }
+
+    // Initialize SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    // Smooth scroll for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Add scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.card-hover').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(card);
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d0155248051ea86',t:'MTc3MTQ1NzY0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
